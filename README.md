@@ -1,3 +1,4 @@
-# test
+# sauron
 
-This is a template to be used with sauron.
+An easy template clone cli made in Deno.
+
