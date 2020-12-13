@@ -1,10 +1,24 @@
-import { clone } from './clone.ts';
-import { inputs, InputsOptions } from './input.ts';
+import { inputs } from './input.ts';
 import { expandGlob } from "https://deno.land/std@0.80.0/fs/mod.ts";
 import { relative } from "https://deno.land/std@0.80.0/path/mod.ts";
 import * as fs from "https://deno.land/std@0.62.0/fs/mod.ts";
+import { basename } from "https://deno.land/std@0.80.0/path/mod.ts";
 import { readConfig } from './config.ts';
 import { register } from './register.ts';
+
+type GlobalParametersInput = {
+  destination: string,
+  template: string,
+  templateName?: string,
+  templateVersion?: string,
+}
+const getGlobalParameters = ({ destination, template, templateName, templateVersion }: GlobalParametersInput) => ({
+  DESTINATION: destination,
+  DESTINATION_BASENAME: basename(destination),
+  TEMPLATE_NAME: templateName,
+  TEMPLATE_VERSION: templateVersion,
+  TEMPLATE: template,
+})
 
 const createReplaceParameters = (parameters: Record<string, string | undefined | boolean>) => (text: string) => {
   return Object.entries(parameters).reduce((result, [name, value]) => {
@@ -89,6 +103,12 @@ export const init = async (
     .then((parameters) => ({
       ...parameters,
       ...providedInputs,
+      ...getGlobalParameters({
+        destination,
+        template,
+        templateName: config.name,
+        templateVersion: config.version,
+      })
     }));
   await copyFiles(templateDir, destination, {
     parameters,

@@ -42,12 +42,12 @@ The config file accept an `inputs` array of inputs to ask the user when using th
 
 All the inputs accept the following options:
 
-- `name` the input name to use inside files and dir/files names
+- `templateName` the input templateName to use inside files and dir/files names
 - `type` the type of the input `question, choose, confirm` 
 - `message` the message to show to the user asking for the input
 - `default` **optional** the default value to use if user skip the question
 
-The `name` could be used inside file name, directory name, and content of file and would be replaced with the value used by the user.
+The `templateName` could be used inside file templateName, directory templateName, and content of file and would be replaced with the value used by the user.
 Variables should be used wrapped in double brackets without spaces `{{INPUT_NAME}}`.
 Example:
 ```typescript 
@@ -64,15 +64,15 @@ Sauron support the following inputs type:
 
     ```yaml
     inputs: 
-      - name: PROJECT_NAME
+      - templateName: PROJECT_NAME
         type: question
-        message: What is the project name?
+        message: What is the project templateName?
     ```
 - `choose` ask user to choose between options
 
     ```yaml
     inputs: 
-      - name: PACKAGE_MANAGER
+      - templateName: PACKAGE_MANAGER
         type: choose
         message: What package manager want to use?
         values:
@@ -83,29 +83,38 @@ Sauron support the following inputs type:
 
     ```yaml
     inputs: 
-      - name: TYPESCRIPT
+      - templateName: TYPESCRIPT
         type: confirm
         message: Whant to use typescript?
         default: yes
     ```
 
 ### Other config
-- `name` the template name
-- `version` the template version
+- `templateName` the template templateName
+- `templateVersion` the template templateVersion
 - `before` message to be logged before the copy of the template
 - `after` message to be logged after the copy of the script, input variables can be used
 
+### Global parameters
+
+Some global parameters can be used like input variables:
+- `DESTINATION` the destination argument
+- `DESTINATION_BASENAME` the destination basename
+- `TEMPLATE_NAME` the template name of the configuration file
+- `TEMPLATE_VERSION` the template version of the configuration file
+- `TEMPLATE` the template url/path argument
+
 Example
 ```yaml
-name: hello-sauron
-version: 0.0.1
+templateName: hello-sauron
+templateVersion: 0.0.1
 inputs:
-  - name: PROJECT_NAME
+  - templateName: PROJECT_NAME
     type: question
-    message: What is the project name?
+    message: What is the project templateName?
 before: Using this awesome template made with sauron
 after: |
-  Project {{PROJECT_NAME}} created successfully
+  Project {{PROJECT_NAME}}@{{TEMPLATE_VERSION}} created successfully 
   run using 'deno run ./src/index.ts'
 ```
 ---
