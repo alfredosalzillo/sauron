@@ -2,6 +2,19 @@
 import { parse } from "https://deno.land/std@0.80.0/flags/mod.ts";
 import { init } from './lib/init.ts';
 
+const helpText = `Usage sauron init DESTINATION --template TEMPLATE [OPTIONS]...
+Init DESTINATION using the TEMPLATE.
+Example sauron init hello-world --template https://github.com/alfredosalzillo/example-sauron-template
+
+Options:
+  -t, --template      OPTIONS template to use (required)
+  --reload            OPTIONS reload the template if cached
+  --inputs.*          OPTIONS inputs to use within the template (Example --inputs.projectName hello-world)
+  -h, --help          OPTIONS show help
+
+Reports bugs to https://github.com/alfredosalzillo/sauron/issues
+`
+
 const firstNotEmpty = (names: string[], object: Record<string, string>): string | undefined => {
   return Object.entries(object).filter(([name]) => names.includes(name)).map(([,value]) => value).find((value) => value !== undefined);
 }
@@ -36,18 +49,16 @@ const main = async (args: string[] = Deno.args) => {
   } = parseArgs(args);
   if (command === 'init') {
     if (help) {
-      console.log('usage:')
-      console.log(' sauron init [destination] --template [template-url]')
+      console.log(helpText);
       return;
     }
-    return init(template!, destination as string, {
-      reload: !!reload,
+    return init(template, destination as string, {
+      reload,
       inputs,
     });
   }
   if (help) {
-    console.log('usage:')
-    console.log(' sauron init [destination] --template [template-url]')
+    console.log(helpText);
     return;
   }
 }
