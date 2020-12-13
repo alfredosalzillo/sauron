@@ -38,7 +38,7 @@ const files = (templateDir: string, exclude: string[] = []) => expandGlob(
   });
 
 type CopyFilesOptions = {
-  parameters: Record<string, string | undefined | boolean>,
+  transform: (string: string) => string,
   exclude?: string[],
 };
 const copyFiles = async (
@@ -47,20 +47,19 @@ const copyFiles = async (
   options: CopyFilesOptions,
 ) => {
   const {
-    parameters,
+    transform,
     exclude = [],
   } = options;
-  const replaceParameters = createReplaceParameters(parameters);
   for await (const file of files(templateDir, exclude)) {
-    const path = `${destination}/${relative(templateDir, file.path)}`;
+    const path = transform(`${destination}/${relative(templateDir, file.path)}`);
     if (file.isDirectory) {
       console.log(`creating dir ${path}`)
-      await Deno.mkdir(replaceParameters(path));
+      await Deno.mkdir(path);
     }
     if (file.isFile) {
       console.log(`creating file ${path}`);
-      const text = await Deno.readTextFile(file.path);
-      await Deno.writeTextFile(replaceParameters(path), replaceParameters(text));
+      const text = await Deno.readTextFile(file.path).then(transform);
+      await Deno.writeTextFile(path, text);
     }
   }
 }
@@ -112,11 +111,11 @@ export const init = async (
         templateVersion: config.version,
       })
     }));
+  const replaceParameters = createReplaceParameters(parameters);
   await copyFiles(templateDir, destination, {
-    parameters,
+    transform: replaceParameters,
     exclude: config.exclude,
   });
-  const replaceParameters = createReplaceParameters(parameters);
   if (config.after) {
     console.log(replaceParameters(config.after));
     return;
