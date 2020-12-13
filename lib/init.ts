@@ -1,4 +1,3 @@
-import { askAll } from './ablo/input.ts';
 import { expandGlob } from "https://deno.land/std@0.80.0/fs/mod.ts";
 import { relative, join } from "https://deno.land/std@0.80.0/path/mod.ts";
 import * as fs from "https://deno.land/std@0.62.0/fs/mod.ts";
@@ -6,6 +5,7 @@ import { basename } from "https://deno.land/std@0.80.0/path/mod.ts";
 import { readConfig } from './config.ts';
 import { register } from './register.ts';
 import * as liquid from './liquid/index.ts';
+import { askAll } from './ablo/index.ts';
 
 type GlobalParametersInput = {
   destination: string,
