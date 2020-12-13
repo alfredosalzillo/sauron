@@ -6,8 +6,12 @@ const isURL = (config: string) => /^http[s]:\/\//.test(config);
 const isFile = (config: string) => /sauron\.yaml$/.test(config);
 
 export type Config = {
+  name?: string,
+  version?: string,
   inputs: InputsOptions,
   exclude?: string[],
+  after?: string,
+  before?: string,
 };
 
 export const readConfigByUrl = (url: string) => fetch(url)

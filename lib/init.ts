@@ -82,6 +82,12 @@ export const init = async (
   }
   await clone(template, templateDir);
   const config = await readConfig(options.config || `${templateDir}/sauron.yaml`);
+  if (config.name) {
+    console.log(`using template ${[config.name, config.version].join(' ')}`);
+  }
+  if (config.before) {
+    console.log(config.before);
+  }
   const inputToAsk = config.inputs.filter(({ name }) => !(name in providedInputs));
   const parameters = await inputs(inputToAsk)
     .then((parameters) => ({
@@ -92,5 +98,10 @@ export const init = async (
     parameters,
     exclude: config.exclude,
   });
+  const replaceParameters = createReplaceParameters(parameters);
+  if (config.after) {
+    console.log(replaceParameters(config.after));
+    return;
+  }
   console.log('init completed');
 }

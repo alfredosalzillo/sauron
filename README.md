@@ -35,6 +35,7 @@ sauron init hello-world --template https://github.com/alfredosalzillo/example-sa
 ## Configuration
 Sauron searches, inside the template repository, for a config file named `sauron.yaml`.
 
+### Inputs
 The config file accept an `inputs` array of inputs to ask the user when using the template.
 
 All the inputs accept the following options:
@@ -86,5 +87,24 @@ Sauron support the following inputs type:
         default: yes
     ```
 
+### Other config
+- `name` the template name
+- `version` the template version
+- `before` message to be logged before the copy of the template
+- `after` message to be logged after the copy of the script, input variables can be used
+
+Example
+```yaml
+name: hello-sauron
+version: 0.0.1
+inputs:
+  - name: PROJECT_NAME
+    type: question
+    message: What is the project name?
+before: Using this awesome template made with sauron
+after: |
+  Project {{PROJECT_NAME}} created successfully
+  run using 'deno run ./src/index.ts'
+```
 ---
 `sauron` - a `Deno` to rule them all.
