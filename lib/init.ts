@@ -87,7 +87,7 @@ export const init = async (
   const templateDir = await register(template, { reload });
   const config = await readConfig(options.config || `${templateDir}/sauron.yaml`);
   if (config.name) {
-    console.log(`using template ${[config.name, config.version].join(' ')}`);
+    console.log(`using template ${[config.name, config.version].join('@')}`);
   }
   if (config.before) {
     console.log(config.before);
