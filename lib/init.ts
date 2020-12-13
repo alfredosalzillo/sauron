@@ -3,8 +3,8 @@ import { inputs, InputsOptions } from './input.ts';
 import { expandGlob } from "https://deno.land/std@0.80.0/fs/mod.ts";
 import { relative } from "https://deno.land/std@0.80.0/path/mod.ts";
 import * as fs from "https://deno.land/std@0.62.0/fs/mod.ts";
-import * as Base64 from "https://deno.land/std@0.74.0/encoding/base64.ts";
 import { readConfig } from './config.ts';
+import { register } from './register.ts';
 
 const createReplaceParameters = (parameters: Record<string, string | undefined | boolean>) => (text: string) => {
   return Object.entries(parameters).reduce((result, [name, value]) => {
@@ -76,11 +76,7 @@ export const init = async (
     return;
   }
   await Deno.mkdir(destination);
-  const templateDir = `~/.cache/.sauron/${Base64.encode(template)}`;
-  if (reload && await fs.exists(templateDir)) {
-    await Deno.remove(templateDir, { recursive: true });
-  }
-  await clone(template, templateDir);
+  const templateDir = await register(template, { reload });
   const config = await readConfig(options.config || `${templateDir}/sauron.yaml`);
   if (config.name) {
     console.log(`using template ${[config.name, config.version].join(' ')}`);

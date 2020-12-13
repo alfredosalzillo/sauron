@@ -21,8 +21,10 @@ Init a directory using a template.
 
 ```bash
 sauron init DESTINATION --template TEMPLATE [OPTIONS]
-# Example
+# Example with remote template
 sauron init hello-world --template https://github.com/alfredosalzillo/example-sauron-template
+# example with local template
+sauron init hello-world --template /templates/hello-world
 ```
 
 ### Options
