@@ -1,5 +1,6 @@
 # sauron
-
+>This is the Master-ring, the One Ring to rule them all. This is the One Ring that he lost many ages ago, to the great weakening of his power. He greatly desires it — but he must not get it.
+> 
 An easy template clone cli made in Deno.
 
 ## INSTALL
