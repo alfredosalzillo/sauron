@@ -5,6 +5,7 @@ import * as fs from "https://deno.land/std@0.62.0/fs/mod.ts";
 import { basename } from "https://deno.land/std@0.80.0/path/mod.ts";
 import { readConfig } from './config.ts';
 import { register } from './register.ts';
+import * as liquid from './liquid/index.ts';
 
 type GlobalParametersInput = {
   destination: string,
@@ -20,14 +21,6 @@ const getGlobalParameters = ({ destination, template, templateName, templateVers
   TEMPLATE: template,
 })
 
-const createReplaceParameters = (parameters: Record<string, string | undefined | boolean>) => (text: string) => {
-  return text.replaceAll(/{{([^}]*)}}/ig, (match, name) => {
-    if (name in parameters) {
-      return String(parameters[name]);
-    }
-    return match;
-  })
-}
 const files = (templateDir: string, exclude: string[] = []) => expandGlob(
   `${templateDir}/**/*`, {
     exclude: [
@@ -38,16 +31,17 @@ const files = (templateDir: string, exclude: string[] = []) => expandGlob(
   });
 
 type CopyFilesOptions = {
-  transform: (string: string) => string,
+  transform?: (string: string) => string,
   exclude?: string[],
 };
+const identity = <T>(input: T) => input;
 const copyFiles = async (
   templateDir: string,
   destination: string,
   options: CopyFilesOptions,
 ) => {
   const {
-    transform,
+    transform = identity,
     exclude = [],
   } = options;
   for await (const file of files(templateDir, exclude)) {
@@ -111,13 +105,13 @@ export const init = async (
         templateVersion: config.version,
       })
     }));
-  const replaceParameters = createReplaceParameters(parameters);
+  const transform = (string: string) => liquid.parse(string, parameters);
   await copyFiles(templateDir, destination, {
-    transform: replaceParameters,
+    transform,
     exclude: config.exclude,
   });
   if (config.after) {
-    console.log(replaceParameters(config.after));
+    console.log(transform(config.after));
     return;
   }
   console.log('init completed');
