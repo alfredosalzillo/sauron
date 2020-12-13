@@ -5,14 +5,22 @@ import { init } from './lib/init.ts';
 const firstNotEmpty = (names: string[], object: Record<string, string>): string | undefined => {
   return Object.entries(object).filter(([name]) => names.includes(name)).map(([,value]) => value).find((value) => value !== undefined);
 }
-const createParseArgs = <Keys extends string>(config: { options: Record<Keys, string[]> }) => (args: string[]): Record<Keys, string | undefined> => {
+const createParseArgs = <Args>(config: { options: Record<keyof Args, string[]> }) => (args: string[]): Args => {
   const parsed = parse(args);
-  return Object.fromEntries(Object.entries<string[]>(config.options).map(([name, values]) => [name, firstNotEmpty(values, parsed)])) as Record<Keys, string | undefined>;
+  return Object.fromEntries(Object.entries<string[]>(config.options)
+    .map(([name, values]) => [name, firstNotEmpty(values, parsed)])) as unknown as Args;
 }
-const parseArgs = createParseArgs({
+type Args = {
+  template: string,
+  reload: boolean,
+  inputs: Record<string, string>,
+  help: boolean,
+};
+const parseArgs = createParseArgs<Args>({
   options: {
     template: ['t', 'template'],
     reload: ['reload'],
+    inputs: ['inputs'],
     help: ['h', 'help'],
   },
 });
@@ -20,14 +28,22 @@ const main = async (args: string[] = Deno.args) => {
   const {
     _: [command, destination],
   } = parse(args);
-  const { template, reload, help } = parseArgs(args);
+  const {
+    template,
+    reload,
+    inputs,
+    help,
+  } = parseArgs(args);
   if (command === 'init') {
     if (help) {
       console.log('usage:')
       console.log(' sauron init [destination] --template [template-url]')
       return;
     }
-    return init(template!, destination as string, !!reload);
+    return init(template!, destination as string, {
+      reload: !!reload,
+      inputs,
+    });
   }
   if (help) {
     console.log('usage:')

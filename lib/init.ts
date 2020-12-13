@@ -48,8 +48,19 @@ const copyFiles = async (
     }
   }
 }
-
-export const init = async (template: string, destination: string, reload: boolean = false) => {
+export type InitOptions = {
+  reload?: boolean,
+  inputs?: Record<string, string | boolean>,
+}
+export const init = async (
+  template: string,
+  destination: string,
+  options: InitOptions,
+) => {
+  const {
+    reload = false,
+    inputs: providedInputs = {},
+  } = options;
   if (!template) {
     console.error('template cannot be null');
     return;
@@ -70,7 +81,12 @@ export const init = async (template: string, destination: string, reload: boolea
   }
   await clone(template, templateDir);
   const config = await readConfig(`${templateDir}/sauron.yaml`);
-  const parameters = await inputs(config.inputs);
+  const inputToAsk = config.inputs.filter(({ name }) => !(name in providedInputs));
+  const parameters = await inputs(inputToAsk)
+    .then((parameters) => ({
+      ...parameters,
+      ...providedInputs,
+    }));
   await copyFiles(templateDir, destination, {
     parameters,
     exclude: config.exclude,
