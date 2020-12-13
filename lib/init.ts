@@ -1,6 +1,6 @@
 import { inputs } from './input.ts';
 import { expandGlob } from "https://deno.land/std@0.80.0/fs/mod.ts";
-import { relative } from "https://deno.land/std@0.80.0/path/mod.ts";
+import { relative, join } from "https://deno.land/std@0.80.0/path/mod.ts";
 import * as fs from "https://deno.land/std@0.62.0/fs/mod.ts";
 import { basename } from "https://deno.land/std@0.80.0/path/mod.ts";
 import { readConfig } from './config.ts';
@@ -36,7 +36,7 @@ type CopyFilesOptions = {
 };
 const identity = <T>(input: T) => input;
 const copyFiles = async (
-  templateDir: string,
+  source: string,
   destination: string,
   options: CopyFilesOptions,
 ) => {
@@ -44,8 +44,8 @@ const copyFiles = async (
     transform = identity,
     exclude = [],
   } = options;
-  for await (const file of files(templateDir, exclude)) {
-    const path = transform(`${destination}/${relative(templateDir, file.path)}`);
+  for await (const file of files(source, exclude)) {
+    const path = transform(join(destination, relative(source, file.path)));
     if (file.isDirectory) {
       console.log(`creating dir ${path}`)
       await Deno.mkdir(path);
@@ -84,7 +84,6 @@ export const init = async (
     console.error(`${destination} is not empty`);
     return;
   }
-  await Deno.mkdir(destination);
   const templateDir = await register(template, { reload });
   const config = await readConfig(options.config || `${templateDir}/sauron.yaml`);
   if (config.name) {
@@ -105,6 +104,7 @@ export const init = async (
         templateVersion: config.version,
       })
     }));
+  await Deno.mkdir(destination);
   const transform = (string: string) => liquid.parse(string, parameters);
   await copyFiles(templateDir, destination, {
     transform,
