@@ -1,19 +1,19 @@
 import { readLines } from "https://deno.land/std@0.76.0/io/bufio.ts";
 
 type InputType = 'question' | 'choose' | 'confirm';
-type InputConfig<Type extends InputType, Options> = {
+type InputOptions<Type extends InputType, Options = {}> = {
   name: string,
   type: Type,
   message: string,
   default?: string,
 } & Options;
-type QuestionConfig = InputConfig<'question', {}>;
-type ChooseConfig = InputConfig<'choose', {
+type QuestionOptions = InputOptions<'question'>;
+type ChooseOptions = InputOptions<'choose', {
   values: string[],
 }>;
-type ConfirmConfig = InputConfig<'confirm', {}>;
-type AskConfig = QuestionConfig | ChooseConfig | ConfirmConfig;
-export type Options = Array<AskConfig>;
+type ConfirmOptions = InputOptions<'confirm'>;
+type AskConfig = QuestionOptions | ChooseOptions | ConfirmOptions;
+export type InputsOptions = Array<AskConfig>;
 
 const write = (message: string) => Deno.stdout.write(new TextEncoder().encode(message));
 const read = async (defaultValue?: string): Promise<string> => {
@@ -72,10 +72,10 @@ const ask = async (config: AskConfig) => {
   }
 }
 
-export const inputs = async (config: Options) => {
+export const inputs = async (options: InputsOptions) => {
   const responses: Record<string, string | undefined | boolean> = {};
-  for (const c of config) {
-    responses[c.name] = await ask(c);
+  for (const input of options) {
+    responses[input.name] = await ask(input);
   }
   return responses;
 }

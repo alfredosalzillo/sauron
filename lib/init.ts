@@ -1,5 +1,5 @@
 import { clone } from './clone.ts';
-import { inputs, Options } from './input.ts';
+import { inputs, InputsOptions } from './input.ts';
 import * as YAML from "https://deno.land/std@0.80.0/encoding/yaml.ts";
 import { expandGlob } from "https://deno.land/std@0.80.0/fs/mod.ts";
 import { relative } from "https://deno.land/std@0.80.0/path/mod.ts";
@@ -7,7 +7,7 @@ import * as fs from "https://deno.land/std@0.62.0/fs/mod.ts";
 import * as Base64 from "https://deno.land/std@0.74.0/encoding/base64.ts";
 
 export type Config = {
-  inputs: Options,
+  inputs: InputsOptions,
   exclude?: string[],
 };
 
