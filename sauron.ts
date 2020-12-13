@@ -23,11 +23,17 @@ const createReplaceParameters = (parameters: Record<string, string | undefined |
 }
 
 const init = async (template: string, destination: string, reload: boolean = false) => {
-    console.assert(!!template, 'template cannot be null');
-    console.assert(!!destination, 'destination cannot be null');
+    if (!template) {
+      console.error('template cannot be null');
+      return;
+    }
+    if (!destination) {
+      console.error('destination cannot be null');
+      return;
+    }
     const destinationExists = await fs.exists(destination);
     if (destinationExists) {
-        console.log(`${destination} is not empty`);
+        console.error(`${destination} is not empty`);
         return;
     }
     await Deno.mkdir(destination);
