@@ -25,7 +25,7 @@ sauron init hello-world --template https://github.com/alfredosalzillo/example-sa
 - _--inputs.*_ - inputs to use within the template (Example --inputs.projectName hello-world)
 - _-h, --help_ - show help
 
-## Config file
+## Configuration
 Sauron searches, inside the template repository, for a config file named `sauron.yaml`.
 
 The config file accept an `inputs` array of inputs to ask the user when using the template.
