@@ -5,6 +5,7 @@ type InputConfig<Type extends InputType, Options> = {
   name: string,
   type: Type,
   message: string,
+  default?: string,
 } & Options;
 type QuestionConfig = InputConfig<'question', {}>;
 type ChooseConfig = InputConfig<'choose', {
@@ -15,14 +16,14 @@ type AskConfig = QuestionConfig | ChooseConfig | ConfirmConfig;
 export type Options = Array<AskConfig>;
 
 const write = (message: string) => Deno.stdout.write(new TextEncoder().encode(message));
-const response = async (): Promise<string> => {
-  return readLines(Deno.stdin).next().then(({ value }) => value);
+const response = async (defaultValue?: string): Promise<string> => {
+  return readLines(Deno.stdin).next().then(({ value }) => value || defaultValue);
 }
 
-const question = async (message: string) => {
-  await write(`${message} `);
+const question = async (message: string, defaultValue?: string) => {
+  await write(`${message} ${defaultValue ? `(default ${defaultValue}) ` : ''}`);
   while (true) {
-    const rawResponse = await response();
+    const rawResponse = await response(defaultValue);
     if (rawResponse) {
       return rawResponse;
     }
@@ -30,13 +31,13 @@ const question = async (message: string) => {
   }
 }
 
-const choose = async (message: string, values: string[]) => {
-  console.log(message);
+const choose = async (message: string, values: string[], defaultValue?: string) => {
+  console.log(`${message}${defaultValue ? ` (default ${defaultValue})` : ''}`);
   console.log();
   values.forEach((value, i) => console.log(`  ${i} - ${value}`))
   console.log();
   while (true) {
-    const rawResponse = await response();
+    const rawResponse = await response(defaultValue);
     const index = Number(rawResponse);
     const value = values[index];
     if (value) {
@@ -46,10 +47,10 @@ const choose = async (message: string, values: string[]) => {
   }
 }
 
-const confirm = async (message: string): Promise<boolean> => {
-  await write(`${message} (yes|NO)`);
+const confirm = async (message: string, defaultValue?: string): Promise<boolean> => {
+  await write(`${message} [yes|NO]${defaultValue ? ` (default ${defaultValue})` : ''}`);
   while (true) {
-    const rawResponse = await response();
+    const rawResponse = await response(defaultValue);
     if (/y|Y|yes|YES/ig.test(rawResponse)) {
       return true;
     }
@@ -63,11 +64,11 @@ const confirm = async (message: string): Promise<boolean> => {
 const ask = async (config: AskConfig) => {
   switch (config.type) {
     case 'question':
-      return question(config.message);
+      return question(config.message, config.default);
     case 'choose':
-      return  choose(config.message, config.values);
+      return  choose(config.message, config.values, config.default);
     case 'confirm':
-      return  confirm(config.message);
+      return  confirm(config.message, config.default);
   }
 }
 
