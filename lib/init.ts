@@ -1,4 +1,4 @@
-import { inputs } from './input.ts';
+import { askAll } from './ablo/input.ts';
 import { expandGlob } from "https://deno.land/std@0.80.0/fs/mod.ts";
 import { relative, join } from "https://deno.land/std@0.80.0/path/mod.ts";
 import * as fs from "https://deno.land/std@0.62.0/fs/mod.ts";
@@ -93,7 +93,7 @@ export const init = async (
     console.log(config.before);
   }
   const inputToAsk = config.inputs.filter(({ name }) => !(name in providedInputs));
-  const parameters = await inputs(inputToAsk)
+  const parameters = await askAll(inputToAsk)
     .then((parameters) => ({
       ...parameters,
       ...providedInputs,

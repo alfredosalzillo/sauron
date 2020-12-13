@@ -1,13 +1,13 @@
 import * as YAML from 'https://deno.land/std@0.80.0/encoding/yaml.ts';
 import * as fs from 'https://deno.land/std@0.62.0/fs/mod.ts';
-import { InputsOptions } from './input.ts';
+import { AskAllOptions } from './ablo/input.ts';
 import isURL from './validator/isURL.ts';
 import isFile from './validator/isFile.ts';
 
 export type Config = {
   name?: string,
   version?: string,
-  inputs: InputsOptions,
+  inputs: AskAllOptions,
   exclude?: string[],
   after?: string,
   before?: string,

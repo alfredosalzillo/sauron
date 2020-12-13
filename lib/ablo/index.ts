@@ -1,26 +1,11 @@
 import { readLines } from "https://deno.land/std@0.76.0/io/bufio.ts";
 
-type InputType = 'question' | 'choose' | 'confirm';
-type InputOptions<Type extends InputType, Options = {}> = {
-  name: string,
-  type: Type,
-  message: string,
-  default?: string,
-} & Options;
-type QuestionOptions = InputOptions<'question'>;
-type ChooseOptions = InputOptions<'choose', {
-  values: string[],
-}>;
-type ConfirmOptions = InputOptions<'confirm'>;
-type AskConfig = QuestionOptions | ChooseOptions | ConfirmOptions;
-export type InputsOptions = Array<AskConfig>;
-
 const write = (message: string) => Deno.stdout.write(new TextEncoder().encode(message));
 const read = async (defaultValue?: string): Promise<string> => {
   return readLines(Deno.stdin).next().then(({ value }) => value || defaultValue);
 }
 
-const question = async (message: string, defaultValue?: string) => {
+export const question = async (message: string, defaultValue?: string) => {
   await write(`${message} ${defaultValue ? `(default ${defaultValue}) ` : ''}`);
   while (true) {
     const rawResponse = await read(defaultValue);
@@ -31,7 +16,7 @@ const question = async (message: string, defaultValue?: string) => {
   }
 }
 
-const choose = async (message: string, values: string[], defaultValue?: string) => {
+export const choose = async (message: string, values: string[], defaultValue?: string) => {
   console.log(`${message}${defaultValue ? ` (default ${defaultValue})` : ''}`);
   console.log();
   values.forEach((value, i) => console.log(`  ${i} - ${value}`))
@@ -47,7 +32,7 @@ const choose = async (message: string, values: string[], defaultValue?: string) 
   }
 }
 
-const confirm = async (message: string, defaultValue?: string): Promise<boolean> => {
+export const confirm = async (message: string, defaultValue?: string): Promise<boolean> => {
   await write(`${message} [yes|NO]${defaultValue ? ` (default ${defaultValue})` : ''}`);
   while (true) {
     const rawResponse = await read(defaultValue);
@@ -61,7 +46,21 @@ const confirm = async (message: string, defaultValue?: string): Promise<boolean>
   }
 }
 
-const ask = async (config: AskConfig) => {
+export type InputType = 'question' | 'choose' | 'confirm';
+export type InputOptions<Type extends InputType, Options = {}> = {
+  name: string,
+  type: Type,
+  message: string,
+  default?: string,
+} & Options;
+export type QuestionOptions = InputOptions<'question'>;
+export type ChooseOptions = InputOptions<'choose', {
+  values: string[],
+}>;
+export type ConfirmOptions = InputOptions<'confirm'>;
+export type AskOptions = QuestionOptions | ChooseOptions | ConfirmOptions;
+export type AskAllOptions = Array<AskOptions>;
+export const ask = async (config: AskOptions) => {
   switch (config.type) {
     case 'question':
       return question(config.message, config.default);
@@ -72,7 +71,7 @@ const ask = async (config: AskConfig) => {
   }
 }
 
-export const inputs = async (options: InputsOptions) => {
+export const askAll = async (options: AskAllOptions) => {
   const responses: Record<string, string | undefined | boolean> = {};
   for (const input of options) {
     responses[input.name] = await ask(input);
