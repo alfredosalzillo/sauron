@@ -68,4 +68,6 @@ const main = async (args: string[] = Deno.args) => {
   }
 }
 
-await main();
+if (import.meta.main) {
+  await main();
+}
