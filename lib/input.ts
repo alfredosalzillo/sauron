@@ -14,11 +14,13 @@ type ConfirmConfig = InputConfig<'confirm', {}>;
 type AskConfig = QuestionConfig | ChooseConfig | ConfirmConfig;
 export type Options = Array<AskConfig>;
 
+const write = (message: string) => Deno.stdout.write(new TextEncoder().encode(message));
 const response = async (): Promise<string> => {
   return readLines(Deno.stdin).next().then(({ value }) => value);
 }
+
 const question = async (message: string) => {
-  console.log(message);
+  await write(`${message} `);
   return response();
 }
 
@@ -39,7 +41,7 @@ const choose = async (message: string, values: string[]) => {
 }
 
 const confirm = async (message: string): Promise<boolean> => {
-  console.log(`${message} (yes|NO)`);
+  await write(`${message} (yes|NO)`);
   while (true) {
     const rawResponse = await response();
     if (/y|Y|yes|YES/ig.test(rawResponse)) {
