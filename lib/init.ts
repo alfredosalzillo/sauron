@@ -84,8 +84,8 @@ export const init = async (
     console.error(`${destination} is not empty`);
     return;
   }
-  const templateDir = await register(template, { reload });
-  const config = await readConfig(options.config || `${templateDir}/sauron.yaml`);
+  const source = await register(template, { reload });
+  const config = await readConfig(options.config || `${source}/sauron.yaml`);
   if (config.name) {
     console.log(`using template ${[config.name, config.version].join('@')}`);
   }
@@ -106,7 +106,7 @@ export const init = async (
     }));
   await Deno.mkdir(destination);
   const transform = (string: string) => liquid.parse(string, parameters);
-  await copyFiles(templateDir, destination, {
+  await copyFiles(source, destination, {
     transform,
     exclude: config.exclude,
   });
