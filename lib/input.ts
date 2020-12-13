@@ -21,7 +21,13 @@ const response = async (): Promise<string> => {
 
 const question = async (message: string) => {
   await write(`${message} `);
-  return response();
+  while (true) {
+    const rawResponse = await response();
+    if (rawResponse) {
+      return rawResponse;
+    }
+    console.log(`invalid response: ${rawResponse}`);
+  }
 }
 
 const choose = async (message: string, values: string[]) => {
