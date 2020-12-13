@@ -1,18 +1,42 @@
-import * as YAML from "https://deno.land/std@0.80.0/encoding/yaml.ts";
-import * as fs from "https://deno.land/std@0.62.0/fs/mod.ts";
+import * as YAML from 'https://deno.land/std@0.80.0/encoding/yaml.ts';
+import * as fs from 'https://deno.land/std@0.62.0/fs/mod.ts';
 import { InputsOptions } from './input.ts';
+
+const isURL = (config: string) => /^http[s]:\/\//.test(config);
+const isFile = (config: string) => /sauron\.yaml$/.test(config);
 
 export type Config = {
   inputs: InputsOptions,
   exclude?: string[],
 };
 
-export const readConfig = async (file: string): Promise<Config> => {
-  if (!fs.exists(file)) {
-    console.log(`config file ${file} not found inside the template, using default.`)
-    return {
-      inputs: [],
-    };
+export const readConfigByUrl = (url: string) => fetch(url)
+  .then(async (response) => {
+    if (response.ok) {
+      return response.text();
+    }
+    throw new Error(await response.text());
+  })
+  .then(YAML.parse) as Promise<Config>;
+
+export const readConfig = async (config: string): Promise<Config> => {
+  if (isURL(config)) {
+    console.log(`using remote config ${config}`);
+    return readConfigByUrl(config);
   }
-  return Deno.readTextFile(file).then(YAML.parse) as Promise<Config>;
+  if (isFile(config)) {
+    if (!fs.exists(config)) {
+      console.log(`config file ${config} not found inside the template, using default.`)
+      return {
+        inputs: [],
+      };
+    }
+    return Deno.readTextFile(config).then(YAML.parse) as Promise<Config>;
+  }
+  try {
+    return JSON.parse(config);
+  } catch (e) {
+    console.error(e);
+  }
+  throw new TypeError('invalid config type, should be an URL or a PATH');
 };

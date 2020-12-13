@@ -8,6 +8,7 @@ Example sauron init hello-world --template https://github.com/alfredosalzillo/ex
 
 Options:
   -t, --template      OPTIONS template to use (required)
+  -c, --config        OPTIONS override configuration to use
   --reload            OPTIONS reload the template if cached
   --inputs.*          OPTIONS inputs to use within the template (Example --inputs.projectName hello-world)
   -h, --help          OPTIONS show help
@@ -25,13 +26,15 @@ const createParseArgs = <Args>(config: { options: Record<keyof Args, string[]> }
 }
 type Args = {
   template: string,
-  reload: boolean,
-  inputs: Record<string, string>,
-  help: boolean,
+  config?: string,
+  reload?: boolean,
+  inputs?: Record<string, string>,
+  help?: boolean,
 };
 const parseArgs = createParseArgs<Args>({
   options: {
     template: ['t', 'template'],
+    config: ['c', 'config'],
     reload: ['reload'],
     inputs: ['inputs'],
     help: ['h', 'help'],
@@ -43,6 +46,7 @@ const main = async (args: string[] = Deno.args) => {
   } = parse(args);
   const {
     template,
+    config,
     reload,
     inputs,
     help,
@@ -53,6 +57,7 @@ const main = async (args: string[] = Deno.args) => {
       return;
     }
     return init(template, destination as string, {
+      config,
       reload,
       inputs,
     });

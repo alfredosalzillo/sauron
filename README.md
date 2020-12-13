@@ -6,7 +6,13 @@ An easy template clone cli made in Deno.
 ## INSTALL
 
 ```bash
-deno install --unstable --allow-read --allow-write --allow-run -n sauron https://deno.land/x/sauronx/sauron.ts
+deno install \
+      --unstable \
+      --allow-read \
+      --allow-write \
+      --allow-run \
+      --allow-net \
+      -n sauron https://deno.land/x/sauronx/sauron.ts
 ```
 
 ## USAGE
@@ -21,6 +27,7 @@ sauron init hello-world --template https://github.com/alfredosalzillo/example-sa
 
 ### Options
 - _-t, --template_ - template to use (required)
+- _-c, --config_ - override configuration, could be a path to a local file, an url or a JSON string
 - _--reload_ - reload the template if cached
 - _--inputs.*_ - inputs to use within the template (Example --inputs.projectName hello-world)
 - _-h, --help_ - show help

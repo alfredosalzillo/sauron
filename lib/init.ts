@@ -51,6 +51,7 @@ const copyFiles = async (
 export type InitOptions = {
   reload?: boolean,
   inputs?: Record<string, string | boolean>,
+  config?: string,
 }
 export const init = async (
   template: string,
@@ -80,7 +81,7 @@ export const init = async (
     await Deno.remove(templateDir, { recursive: true });
   }
   await clone(template, templateDir);
-  const config = await readConfig(`${templateDir}/sauron.yaml`);
+  const config = await readConfig(options.config || `${templateDir}/sauron.yaml`);
   const inputToAsk = config.inputs.filter(({ name }) => !(name in providedInputs));
   const parameters = await inputs(inputToAsk)
     .then((parameters) => ({
