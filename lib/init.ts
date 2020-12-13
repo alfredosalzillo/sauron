@@ -21,10 +21,12 @@ const getGlobalParameters = ({ destination, template, templateName, templateVers
 })
 
 const createReplaceParameters = (parameters: Record<string, string | undefined | boolean>) => (text: string) => {
-  return Object.entries(parameters).reduce((result, [name, value]) => {
-    if (!value) return result;
-    return result.replaceAll(`{{${name}}}`, String(value));
-  }, text);
+  return text.replaceAll(/{{([^}]*)}}/ig, (match, name) => {
+    if (name in parameters) {
+      return String(parameters[name]);
+    }
+    return match;
+  })
 }
 const files = (templateDir: string, exclude: string[] = []) => expandGlob(
   `${templateDir}/**/*`, {

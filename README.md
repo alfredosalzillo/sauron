@@ -48,7 +48,7 @@ All the inputs accept the following options:
 - `default` **optional** the default value to use if user skip the question
 
 The `templateName` could be used inside file templateName, directory templateName, and content of file and would be replaced with the value used by the user.
-Variables should be used wrapped in double brackets without spaces `{{INPUT_NAME}}`.
+Variables should be used wrapped in double brackets `{{ INPUT_NAME }}` or `{{INPUT_NAME}}`.
 Example:
 ```typescript 
 // file: {{COMPONENT_NAME}}.tsx
