@@ -18,6 +18,42 @@ const createReplaceParameters = (parameters: Record<string, string | undefined |
     return result.replaceAll(`{{${name}}}`, String(value));
   }, text);
 }
+const files = (templateDir: string, exclude: string[] = []) => expandGlob(
+  `${templateDir}/**/*`, {
+    exclude: [
+      `${templateDir}/.git`,
+      `${templateDir}/sauron.yaml`,
+      ...exclude,
+    ],
+  });
+
+type CopyFilesOptions = {
+  parameters: Record<string, string | undefined | boolean>,
+  exclude?: string[],
+};
+const copyFiles = async (
+  templateDir: string,
+  destination: string,
+  options: CopyFilesOptions,
+) => {
+  const {
+    parameters,
+    exclude = [],
+  } = options;
+  const replaceParameters = createReplaceParameters(parameters);
+  for await (const file of files(templateDir, exclude)) {
+    const path = `${destination}/${relative(templateDir, file.path)}`;
+    if (file.isDirectory) {
+      console.log(`creating dir ${path}`)
+      await Deno.mkdir(replaceParameters(path));
+    }
+    if (file.isFile) {
+      console.log(`creating file ${path}`);
+      const text = await Deno.readTextFile(file.path);
+      await Deno.writeTextFile(replaceParameters(path), replaceParameters(text));
+    }
+  }
+}
 
 export const init = async (template: string, destination: string, reload: boolean = false) => {
   if (!template) {
@@ -40,23 +76,10 @@ export const init = async (template: string, destination: string, reload: boolea
   }
   await clone(template, templateDir);
   const config = await readSauronConfig(`${templateDir}/sauron.yaml`);
-  const parameters  = await inputs(config.inputs);
-  const replaceParameters = createReplaceParameters(parameters);
-  const { exclude = [] } = config;
-  for await (const file of expandGlob(
-    `${templateDir}/**/*`, {
-      exclude: [`${templateDir}/.git`, `${templateDir}/sauron.yaml`, ...exclude],
-    })) {
-    const path = `${destination}/${relative(templateDir, file.path)}`;
-    if (file.isDirectory) {
-      console.log(`creating dir ${path}`)
-      await Deno.mkdir(replaceParameters(path));
-    }
-    if (file.isFile) {
-      console.log(`creating file ${path}`);
-      const text = await Deno.readTextFile(file.path);
-      await Deno.writeTextFile(replaceParameters(path), replaceParameters(text));
-    }
-  }
+  const parameters = await inputs(config.inputs);
+  await copyFiles(templateDir, destination, {
+    parameters,
+    exclude: config.exclude,
+  });
   console.log('init completed');
 }
