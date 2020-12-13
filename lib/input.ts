@@ -16,14 +16,14 @@ type AskConfig = QuestionConfig | ChooseConfig | ConfirmConfig;
 export type Options = Array<AskConfig>;
 
 const write = (message: string) => Deno.stdout.write(new TextEncoder().encode(message));
-const response = async (defaultValue?: string): Promise<string> => {
+const read = async (defaultValue?: string): Promise<string> => {
   return readLines(Deno.stdin).next().then(({ value }) => value || defaultValue);
 }
 
 const question = async (message: string, defaultValue?: string) => {
   await write(`${message} ${defaultValue ? `(default ${defaultValue}) ` : ''}`);
   while (true) {
-    const rawResponse = await response(defaultValue);
+    const rawResponse = await read(defaultValue);
     if (rawResponse) {
       return rawResponse;
     }
@@ -37,7 +37,7 @@ const choose = async (message: string, values: string[], defaultValue?: string) 
   values.forEach((value, i) => console.log(`  ${i} - ${value}`))
   console.log();
   while (true) {
-    const rawResponse = await response(defaultValue);
+    const rawResponse = await read(defaultValue);
     const index = Number(rawResponse);
     const value = values[index];
     if (value) {
@@ -50,7 +50,7 @@ const choose = async (message: string, values: string[], defaultValue?: string) 
 const confirm = async (message: string, defaultValue?: string): Promise<boolean> => {
   await write(`${message} [yes|NO]${defaultValue ? ` (default ${defaultValue})` : ''}`);
   while (true) {
-    const rawResponse = await response(defaultValue);
+    const rawResponse = await read(defaultValue);
     if (/y|Y|yes|YES/ig.test(rawResponse)) {
       return true;
     }
