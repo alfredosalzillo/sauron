@@ -42,12 +42,12 @@ The config file accept an `inputs` array of inputs to ask the user when using th
 
 All the inputs accept the following options:
 
-- `templateName` the input templateName to use inside files and dir/files names
+- `name` the input name to use inside files and dir/files names
 - `type` the type of the input `question, choose, confirm` 
 - `message` the message to show to the user asking for the input
 - `default` **optional** the default value to use if user skip the question
 
-The `templateName` could be used inside file templateName, directory templateName, and content of file and would be replaced with the value used by the user.
+The `name` could be used inside file name, directory name, and content of file and would be replaced with the value used by the user.
 Variables should be used wrapped in double brackets `{{ INPUT_NAME }}` or `{{INPUT_NAME}}`.
 Example:
 ```typescript 
@@ -64,7 +64,7 @@ Sauron support the following inputs type:
 
     ```yaml
     inputs: 
-      - templateName: PROJECT_NAME
+      - name: PROJECT_NAME
         type: question
         message: What is the project templateName?
     ```
@@ -72,7 +72,7 @@ Sauron support the following inputs type:
 
     ```yaml
     inputs: 
-      - templateName: PACKAGE_MANAGER
+      - name: PACKAGE_MANAGER
         type: choose
         message: What package manager want to use?
         values:
@@ -83,14 +83,14 @@ Sauron support the following inputs type:
 
     ```yaml
     inputs: 
-      - templateName: TYPESCRIPT
+      - name: TYPESCRIPT
         type: confirm
         message: Whant to use typescript?
         default: yes
     ```
 
 ### Other config
-- `templateName` the template templateName
+- `name` the template name
 - `templateVersion` the template templateVersion
 - `before` message to be logged before the copy of the template
 - `after` message to be logged after the copy of the script, input variables can be used
@@ -106,12 +106,12 @@ Some global parameters can be used like input variables:
 
 Example
 ```yaml
-templateName: hello-sauron
-templateVersion: 0.0.1
+name: hello-sauron
+version: 0.0.1
 inputs:
-  - templateName: PROJECT_NAME
+  - name: PROJECT_NAME
     type: question
-    message: What is the project templateName?
+    message: What is the project name?
 before: Using this awesome template made with sauron
 after: |
   Project {{PROJECT_NAME}}@{{TEMPLATE_VERSION}} created successfully 
