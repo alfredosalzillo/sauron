@@ -91,7 +91,7 @@ Sauron support the following inputs type:
 
 ### Other config
 - `name` the template name
-- `templateVersion` the template templateVersion
+- `version` the template version
 - `before` message to be logged before the copy of the template
 - `after` message to be logged after the copy of the script, input variables can be used
 
